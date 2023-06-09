@@ -1,0 +1,80 @@
+URL => localhost:8000//product/(slug)
+    => localhost:8000//product?category=(slug)
+
+route::get('/product/{slug}','ProductController @productDetail);
+
+php artisan make:controller PageController  
+==========================================
+productDetail($slug){
+   $product = Product::where('slug',$slug)->first();
+   !$product ? 'Product Not Found!';
+   $category = Category::withCount('product')->get();
+   return view('product-detail')->compact('category','slug');
+}
+
+product_detail.blade.php
+========================
+(1) <div>All Category</div>
+    @foreach($category)
+      <a href="url('/product?category='.$c->slug)">
+         <>Name</>
+         <>product_count</>
+      </a>
+    @endforeach
+
+(2) <div id="root">
+      productDetail.js (import productDetail.jsx)
+    </div>
+
+
+
+react => productDetail.js (import .jsx)
+react => productDetail => productDetail.jsx (export)
+react => productDetail => Component=>Review.jsx
+
+php artisan make:controller Api/ProductApi
+Route::get('/product/{slug}','Api\ProductApi@detail')
+function detail($slug){
+  $product = Product::where('slug',$slug)
+  ->with('review.user','category','brand','color')
+  ->first()
+
+  return response()->json([
+    'message' => true,
+    'data'    => $product
+  ])
+}
+localhost:8000//api/product/092080933product-one
+
+
+ProductDetail.jsx
+=================
+(1) const[product,setProduct] = useState([])
+    const[loader,setLoader] = useState([])
+    const product_slug = window.product_slug
+
+    axios.get('/api/product'+product_slug).then(({data})=>{
+      setProduct(data.data);
+    })
+
+    {loader && <Spinner/>}
+    {!loader && 
+       {product.name} //Product Name
+       {product.brand.name} //Category Name
+       {product.category.name} //Brand Name
+       {product.color.map(d.name)} //Color Name
+    }
+
+(2) <Review review={product.review} />  //send props
+
+Review.jsx (static looping)
+===========================
+function Review ({review}) {  *because of array*
+  {review.map((d)=>(
+    <p>{d.user.name}</p> //Review User Name
+    <p>{d.review}</p> //Review Description
+  ))}
+}
+
+
+

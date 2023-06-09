@@ -1,0 +1,84 @@
+php artisan make:controller PageController
+PageController => home()
+
+pubic => frontend  => asset(css,js,img)
+
+resources => views => layout => master.blade.php
+                   => home.blade.php (#root)
+
+
+resources => react => Home => Home.jsx (exports)
+                   => home.js (import)
+
+                   => Component => Spinner.jsx
+
+
+webpack.mix.js => mix.js("resources/react/home.js", "public/react").react();
+
+php artisan make:controller Api/HomeApi
+api.php     => route::get('/home','Api\HomeApi@home')
+
+HomeApi.php => $category          = Category::withCount('product')->get()
+            => $featureProduct    = Product::all()->random(2)
+            => $productByCategory = Category::has('product')->take(2)->get()
+               foreach($productByCategory as $k => $v) {
+                  $productByCategory[$k]->product = Product::where('category_id',$v->id)->take(6)->get();
+               }
+            => return response()->json([
+                  'success' => true,
+                  'data'    => [
+                     'category'          => $category,
+                     'featureProduct'    => $featured_product,
+                     'productByCategory' => $productByCategory
+                  ]
+               ])
+               
+
+Home.jsx    => [loader,category,featured_product,productByCategory] => 4 state
+
+            => const [category, setCategory] = useState([]);
+               const [featureProduct, setFeatureProduct] = useState([]);
+               const [productByCategory, setProductByCategory] = useState([]);
+               const [loader, setLoader] = useState(true);
+
+               const fetchProduct = () => {
+                  axios.get("api/home").then((d) => {
+                     const { category, featureProduct, productByCategory } = d.data.data;
+                     setCategory(category);
+                     setFeatureProduct(featureProduct);
+                     setproductByCategory(productByCategory);
+                     setLoader(false);
+                  });
+               };
+
+            => useEffect(() => {
+                  fetchProduct();
+               }, []);
+            
+            => {loader && <Spinner/>}
+            => {!loader && JSX}
+            => {animals.map((d)=>(
+                  JSX
+               ))}
+
+
+
+/*global object*/
+=> master.blade.php
+<script>
+   window.updateCart = (cart) => {
+      $cartCount = document.getElementById('cartCount');
+      $cartCount.innerText = cart;
+   }
+   window.updateCart(10);
+
+   window.auth = @json(auth()->user());  /* null || {authuser:1} */ 
+</script>
+
+
+=> web.php
+Route::get('/authUser',function(){
+   $user = User::find(1);
+   auth()->login($user);
+   return auth()->user();
+})

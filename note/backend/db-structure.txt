@@ -1,0 +1,47 @@
+users
+======
+id name email password image
+
+admins
+======
+
+category
+========
+id   slug   name mm_name image
+
+color
+=====
+id   slug   name
+
+brands
+======
+id   slug   name
+
+supplier
+========
+id   name    image    description (slug ? true : false)
+
+products
+========
+id   category_id   supplier_id  brand_id   slug    name  image  description  buy_price  sale_price  discount_price  total_qty   like_count  view_count
+
+product_reviews
+===============
+user_id  product_id  rating   review 
+
+product_add_transaction
+=======================
+supplier_id    product_id  total_qty description   (buy_date)
+
+product_remove_transaction
+=======================
+product_id  total_qty description   (buy_date)
+
+prouduct_orders
+===============
+user_id  product_id   total_qty  status('pending','cancel','success')
+
+prouduct_carts (react.js)
+==============
+user_id  product_id  total_qty   
+

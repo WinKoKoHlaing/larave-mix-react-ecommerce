@@ -1,0 +1,55 @@
+php artisan make:model Admin -m
+===============================
+*copy User.php to Admin.php
+
+
+admins_table 
+============
+*copy user_table migration texts to admin_table 
+
+auth.php
+========
+'guards'    => 'admin' => [
+               'driver' => 'session',
+               'provider' => 'admins',
+               ],
+
+'providers' => 'admins' => [
+               'driver' => 'eloquent',
+               'model' => App\Models\Admin::class,
+               ],
+
+web.php
+=======
+PageController::get('/login') => showLogin()
+PageController::post('/login') => login()
+PageController::post('/logout') => logout()
+PageController::get('/') => dashboard()
+
+
+php artisan make:controller Admin/PageController
+================================================
+function showLogin() => view(admin.auth.login)
+                     => name,email
+
+function login()     => request->validate['name','email']
+                     => cre(request('name','email'))->attempt
+
+function logout()    => auth()->guard('admin')->logout();
+
+function dashboard() => view('dashboard')
+
+
+
+
+
+php artisan make:middleware AdminMiddleware
+===========================================
+if(!auth()->guard('admin')->check()){
+            return redirect(url('/admin/login'))->with('error','Please Login First!');
+        }
+return $next($request); //normal-url
+
+kernel.php
+==========
+'AdminMiddleware' => AdminMiddleware::class,

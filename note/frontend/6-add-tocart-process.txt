@@ -1,0 +1,73 @@
+php artinsan make:controller Api/CartApi
+
+Route::post('add-to-cart'/{slug},'Api\CartApi@addToCart)
+
+public function addToCart($request,$slug){
+   $product = Product::where('slug',$slug)->first();
+   if(!$product){
+      return response()->json([
+         'message' => false,
+         'data'    => 'Slug Not Found',
+      ])
+   }
+
+
+   ##product_in_cart_already_exist_check##
+   $findInCart = ProductCart::where('user_id',$request->user_id)
+                 ->where('product_id',$product->id)->first();
+   if($findInCart){
+      $findInCart->update([
+         'total_qty' => $findInCart->total_qty+1;
+      ])
+   }else{
+      ProductCart::create([
+         'user_id'    => $request->user_id,
+         'product_id' => $product->id,
+         'total_qty'  => 1
+      ])
+   }
+
+   ##return_auth_user_cart_count##
+   $cartCount = ProductCart::where('user_id',$request->user_id)->first();
+   return response()->json([
+      'message' => true,
+      'data'    => $cartCount
+   ])
+
+}
+
+
+##add to cart##
+[addtoCartBtn] => onClick(()=>addToCart())
+
+const addToCart = ()=>{
+   const user_id = window.auth.id;
+   const slug    = window.product_slug;
+
+   axios.post('api/add-to-cart/' +slug ,{user_id}).then(({data})=>{
+      if(data.message === false){
+         showToast('Product Not Found');
+         setMiniCartLoader(false);
+      }else{
+         window.updateCart(data.data); <= (Global Variable)
+         showToast('Product Added To Cart');
+         setMiniCartLoader(false);
+      }
+   })
+}
+
+
+##mini_cart_loader##
+const [miniCartLoader,setMiniCartLoader] = useState(false);
+
+function addToCart(){
+   setMiniCartLoader(true)
+   axios.post({
+      setMiniCartLoader(false)
+   })
+}
+
+{miniCartLoader && (
+   <minispinner/>
+   <process/>
+)}

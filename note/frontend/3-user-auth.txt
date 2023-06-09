@@ -1,0 +1,21 @@
+php artisan make:controller AuthController
+
+Route::get('/login','AuthController@showLogin');
+Route::post('/login','AuthController@post');
+Route::get('/register','AuthController@showRegister');
+Route::post('/register','AuthController@postRegister');
+
+
+function showRegister() => view('frontend.auth.showRegister')
+                        => name,email,phone,password,image
+
+function postRegister(){
+   return view('frontend.auth.showRegister')
+}
+
+function showLogin(){
+   return view('frontend.auth.showLogin')
+}
+
+function postLogin(){}
+

@@ -1,0 +1,53 @@
+=============================
+         ##web.php##
+=============================
+Route::get('/profile','PageController@showProfile');
+
+
+=============================
+         ##PageController##
+=============================
+public function showProfile(){
+   return view('frontend.profile');
+}
+
+
+===============================
+##view/frontend/profile.blade##
+===============================
+<div id="root"></div>
+<script src="{{ mix('react/profile.js') }}"></script>
+
+
+=========================
+      ##profile.js##
+=========================
+<Nav />
+<Routes>
+      <Route path="/" element={<Cart />} />
+      <Route path="/order-list" element={<Order />} />
+      <Route path="/profile" element={<Profile />} />
+      <Route path="/change-password" element={<ChangePassword />} />
+</Routes>
+
+
+=========================
+##Profile/Nav/Nav.jsx##
+=========================
+<Link to="/" className="btn btn-warning">
+   Cart , Order , Profile , ChangePassword
+</Link>
+
+
+
+=========================
+##Nav-Active##
+=========================
+import {useLocation} from "react-router-dom";
+
+const {pathname} = useLocation();
+console.log(pathname);
+
+<div className={`btn btn-${pathname === '/' ? 'warning' : 'outline-warning'}`}>
+   <Route path="/" element={<Cart />} />
+</div>

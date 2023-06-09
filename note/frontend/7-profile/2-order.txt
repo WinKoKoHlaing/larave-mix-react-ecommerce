@@ -1,0 +1,84 @@
+Route::get('/orders','Api\CartApi@showOrder');
+
+=============================
+##CartApi##
+=============================
+public function showOrder(Request $request){
+   $user_id = $request->user_id;
+   $user_orders = ProductOrder::where('user_id',$user_id)
+   ->with('product')
+   ->paginate(2);
+   return response()->json([
+      'message' => true,
+      'data' => $user_orders
+   ]);
+}
+
+=============================
+##Order.jsx##
+=============================
+ const [order, setOrder] = useState({});
+   const [loader, setLoader] = useState(true);
+   const [page, setPage] = useState(1);
+
+   useEffect(() => {
+      const user_id = window.auth.id;
+      axios
+         .get(`/api/orders?page=${page}&user_id=${user_id}`)
+         .then(({ data }) => {
+               // console.log(data.data);
+               setOrder(data.data);
+               setLoader(false);
+         });
+ },[page]);
+
+ {loader && <Spinner/>}
+ {!loader && (
+   <>
+      {order.data.map((d) => (
+         <p>Image</p>
+         <p>Name</p>
+         <p>Qty</p>
+         <p>Price</p>
+         <p>Status</p>
+      ))}
+   </>
+ )}
+
+=============================
+         ##status#
+=============================
+ {d.status === "pending" && (
+      <div className="badge badge-primary">
+         pending
+      </div>
+)}
+{d.status === "success" && (
+      <div className="badge badge-success">
+         success
+      </div>
+)}
+{d.status === "cancel" && (
+      <div className="badge badge-danger">
+         cancel
+      </div>
+)}
+
+=============================
+      ##paginate##
+=============================
+<button 
+   className="btn btn-dark"
+   disabled={order.prev_page_url === null ? true : false}
+   onClick={() => setPage(page - 1)}>
+   <i className="fas fa-arrow-left"></i>
+</button>
+
+<button 
+   className="btn btn-dark"
+   disabled={order.next_page_url === null ? true : false}
+   onClick={() => setPage(page + 1)}>
+   <i className="fas fa-arrow-left"></i>
+</button>
+
+

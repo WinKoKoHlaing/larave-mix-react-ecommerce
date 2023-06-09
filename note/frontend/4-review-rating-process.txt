@@ -1,0 +1,88 @@
+yarn add react-star-ratings
+
+php artisan make:controller Api/ReviewApi 
+Route::post('/make-review/{slug}','Api\ReviewApi@makeReview');
+URL = localhost:8000/api/make-review/{098932slug-one}
+
+
+ReviewApi => (absorb-data-from-axios & filter-result-produce-to-axios)
+=========
+fun makeReview($request , $slug){
+   ##find product##
+   $product = Product::where($slug)->first()
+   (!$product) ? response()->json(['message','data'])
+
+   ##Review create##
+   $review = ProductReview::create([
+      'user_id'    => $request->user_id,
+      'product_id' => $product->id,
+      'rating'     => $request->rating,
+      'review'     => $request->comment
+   ])
+
+   ##sendout review to axios##
+   $review = ProductReview::where('id',$review->id)->first()
+   respone()->json([
+      'message' => true,
+      'data'    => $review,
+   ])
+
+
+}
+
+
+Review.jsx
+==========
+[reviewList,setReviewList] = useState(review)
+[rating,setRating] = useState(0)
+[comment,setComment] = useState("")
+[loading,setLoading] = useState(false)
+
+const makeReview = ()=>{
+   user_id = window.auth.id;
+   slug = window.product_slug;
+   data = {user_id,slug,rating,comment}
+
+   axios.post('URL' + slug , data).then(({data})=>{
+      if(data.message === false){
+         showToast('Slug Not Found')
+      }else{
+         ##adding-reviews-to array##
+         setReviewList([...reviewList,data.data])
+      }
+   })
+}
+
+export default function Review({ review }){
+(1)looping rated users
+   {reviewList.map((d)=>(
+    =====================
+      <StarRatings
+         rating={d.rating} <===
+         numberOfStars={5}
+         starRatedColor="#fc7740"
+         starHoverColor="#fc7740"
+         starDimension="20px"
+         name="rating"
+      />
+      {d.user.image_url} //Review User Img
+      {d.user.name}      //Review User Name
+      {d.review}         //Review description
+   ))}
+
+(2)rating & description form 
+   {window.auth && (
+      <StarRatings
+         rating = {rating}
+         ======
+         changeRating:{(rateCount)=>setRating(rateCount)}
+         =============
+      />
+      <Comment
+         onChange = {(e)=>setComment(e.target.value)}
+         ========
+      />
+      <button onClick={()=>makeReview()}></button>
+
+   )}
+}

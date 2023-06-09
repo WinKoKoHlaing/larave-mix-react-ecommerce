@@ -1,0 +1,94 @@
+
+php artisan make:controller Admin/ProductController --resource
+
+Route::resource('product','ProductController')
+
+resources => views => admin => index.php
+                            -> product->latest()->select('slug','name','image','total_qty')
+                            
+                            => index.blade.php
+                            -> image,name,total_qty,add_or_remove-btn,action
+
+
+
+                            => create.php
+                            -> compact('supplier','category','brand','color')
+
+                            => create.blade.php
+                            -> (product_name,product_image,product_description=>summernote)
+                            -> (total_quantity,buy_price,sale_price)
+                            -> (supplier,category,brand,color)
+                            -> create-btn
+                        
+
+                            => summernote-image-upload (serve-request)
+                            -> Route::post('product-upload','ProductController@imageUpload')
+                            -> web.php join (ajax & controller)
+                            -> contentType:false (jquery default option)
+                            -> processData:false (data query string off)
+                            -> ajax({_token:XM02jkioA,photo[]}) to controller(server->response->image)
+                            -> show server response image in summernote
+
+
+                            => store.php
+                            -> $request->validate();
+                            -> image upload (public_path('/img'),$file_name)
+                            -> supplier,category,brand,color -> ('slug',$id) -> validate()
+                            -> product store ($product->create())
+                            -> add product_transaction (supplier_id,'product_id','total_qty')
+                            -> store to product_color (product::find($id)->color()->sync([1,2]))
+                              
+                              
+                              
+                            => edit.blade.php
+                            -> $p = product::('slug',$id)
+                            -> with('supplier','category','brand','color')
+                            -> first()
+
+                            => update.php
+                            -> find_product with ('slug',$id)
+                            -> product_id
+                            -> $request->validate()
+                            -> new addable image validate [request->image,original->image]
+                            -> supplier,category,brand,color -> ('slug',$id) -> validate()
+                            -> product update ($product->update)
+                            -> store to product_color (product::find($id)->color()->sync([1,2])) 
+
+
+                            => delete.php
+                            -> find product
+                            -> remove image
+                            -> delete product_color
+                            -> product->delete()
+
+
+
+
+
+Add or remove (Btn)
+===================
+route::get('/product-add','ProductController@createProduct')
+route::get('/product-remove','ProductController@storeProduct')
+
+
+ProductController => createProduct 
+                  -> (supplier,total_qty,description)
+                  => storeProduct  
+                  -> (ProductAddTransaction::create['supplier','total_qty','description'])        
+                  -> (Product::update['total_qty'])
+
+php artisan make:model ProductAddTransaction -m
+php artisan make:model ProductRemoveTransaction -m
+
+resources => views => product => product-add.blade.php
+                              -> ProductAddTransaction::create(['supplier','total_qty','description'])
+                              -> DB::raw('total_qty +' . $request->qty);
+resources => views => product => product-remove.blade.php
+                              -> ProductAddTransaction::create(['total_qty','description'])
+                              -> DB::raw('total_qty -' . $request->qty);
+
+resources => views => product => product-add-transaction.blade.php
+                              -> ProductAddTransaction::with('product','supplier')
+
+resources => views => product => product-remove-transaction.blade.php
+                              -> ProductRemoveTransaction::with('product')

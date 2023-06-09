@@ -1,0 +1,40 @@
+script
+======
+
+<div id="cartCount">__</div>
+============================
+ window.updateCart = cart => {
+            let cartCount = document.getElementById('cartCount');
+            cartCount.innerText = cart;
+        }
+window.updateCart(15);
+
+
+window.auth = @json(auth()->user());
+===================================
+Route::get('/authUser',function(){
+   $user =  User::find(1);
+   auth()->login($user);
+   return auth()->user();
+});
+
+
+window.product_slug = "{{ $slug }}"
+===================================
+ProductController detail (slug)
+
+
+
+react showToast
+===============
+const showToast = (message)=>{
+   Toastify({
+      text:message,
+      position:"center",
+      style: {
+            background: "linear-gradient(to right, #00b09b, #96c93d)",
+      }
+   }).showToast();
+}
+
+window.showToast("message")

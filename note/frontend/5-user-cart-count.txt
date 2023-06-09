@@ -1,0 +1,10 @@
+ 
+ ##AppServiceProvider.php##
+ view()->composer('*', function ($view) {
+            $cartCount = ProductCart::where('user_id',auth()->id())->count();
+            $view->with('cartCount',$cartCount);
+        });
+
+ 
+ ##global-blade.php##
+ <div id="updateCart">{{$cartCount}}</div>

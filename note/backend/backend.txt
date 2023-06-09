@@ -1,0 +1,102 @@
+install react
+=============
+yarn add react react-dom react-router-dom@6
+yarn watch
+yarn add axios
+yarn add @types/react
+yarn add react-star-ratings
+
+
+react setup in laravel       
+======================
+webpack.mix.js => mix.js ("resources/js/react.js", "public/js").react();
+resources => js => react.js
+*yarn watch
+public => js => react.js (auto minized compile in public)
+
+
+Create Model Migration
+======================
+php artisan make:model Admin -m (see admin-auth.txt)
+
+php artisan make:model Category -m
+php artisan make:model Color -m
+php artisan make:model Brand -m
+php artisan make:model Supplier -m
+php artisan make:model Product -m
+php artisan make:model ProductReview -m
+php artisan make:model ProductAddTransaction -m
+php artisan make:model ProductOrder -m
+php artisan make:model ProductCart -m
+
+
+product_color pivot table
+=========================
+php artisan make:migration create_product_color_table
+
+
+*migration build each tables
+
+Relationship 
+============
+User.php => cart(hasMany) , order(hasMany) , review(hasMany)
+Category.php  => product(hasMany)
+Color.php => product(belongsToMany).pivot('product_color')
+Brand.php => product(hasMany) 
+Supplier.php => transaction(hasMany) , product(hasMany)
+Product.php => brand(belongsTo) , category(belongsTo) , color(belongsToMany) , addTransaction(hasMany), removeTransaction(hasMany) , cart(hasMany) , order(hasMany) , review(hasMany) , supplier(belongsTo)
+ProductReview.php => user(belongsTo) , product(belongsTo)
+ProductAddTransaction.php => supplier(belongsTo) , product(belongsTo)
+ProductRemoveTransaction.php => product(belongsTo)
+ProductOrder.php => user(belongsTo) , product(belongsTo)
+ProductCart.php => user(belongsTo) , product(belongsTo)
+
+
+data seeding
+============
+User,Admin,Category,Brand,Color,Supplier
+
+
+import backend
+==============
+public => backend => assets(css,images,js)
+
+
+Admin::authenication::middleware::route::controller
+===================================================
+see in admin-auth.txt
+
+
+
+backend route
+=============
+PageController :: get() => showLogin();
+PageController :: post() => login();
+Route::group(['prefix'=>"admin",'namespace'=>"Admin",'middleware'=>['AdminMiddleware']]);
+PageController :: get() => showDashboard();
+PageController :: post() => logout();
+
+php artisan make:controller Admin/Category --resource
+CategoryController :: resource ('category')
+
+
+
+backend folder structure
+========================
+view => admin => layout => master.blade.php
+                        => [toastify-alert , session()->has(['success','error'])]
+view => admin => layout => sideNav.blade.php
+
+view => admin => auth => login.blade.php 
+                      => [toastify-alert , session()->has('error) , $errors->any()]
+view => admin => auth => register.blade.php
+
+view => admin => dashboard.blade.php (@extend)
+
+view => admin => category => index.blade.php 
+                          => create.blade.php
+                          => edit.blade.php ($c->slug)
+
+
+
+
